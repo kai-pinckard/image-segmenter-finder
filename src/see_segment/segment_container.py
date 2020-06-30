@@ -5,10 +5,12 @@ if __name__ == "__main__":
     import os
     import json
     import requests
+    import random
+    from datetime import datetime
 
     # 
     POP_SIZE = 10
-    NUM_GENERATIONS = 3
+    NUM_GENERATIONS = 10
     INPUT_IMAGE = "input.jpg"
     LABEL_IMAGE = "label.png"
     SERVER_URL = "http://serverservice/update"  
@@ -35,26 +37,37 @@ if __name__ == "__main__":
     # Convert the RGB 3-channel image into a 1-channel image
     #gmask = (np.sum(gmask, axis=2) > 0)
 
-    # Conduct the genetic search
+    # Create an evolver
     my_evolver = GeneticSearch.Evolver(img, gmask, pop_size=POP_SIZE)
-    population = my_evolver.run(ngen=NUM_GENERATIONS)
+    
+    # Conduct the genetic search
+    population = None
 
-    # Take the best segmentor from the hof and use it to segment the rgb image
-    seg = Segmentors.algoFromParams(my_evolver.hof[0])
-    mask = seg.evaluate(img)
+    for i in range(POP_SIZE):
 
-    # Calculate and print the fitness value of the segmentor
-    fitness = Segmentors.FitnessFunction(mask, gmask)[0]
-    params = my_evolver.hof[0]
+        # if population is uninitialized
+        if population is None:
+            population = my_evolver.run(ngen=1)
 
-    # Combine data into a single object
-    data = {}
-    data["fitness"] = fitness
-    data["params"] = params
+        # Simulate a generation and store population in population variable
+        population = my_evolver.run(ngen=1, population=population)
 
-    # Convert the data to json format
-    data = json.dumps(data)
+        # Take the best segmentor from the hof and use it to segment the rgb image
+        seg = Segmentors.algoFromParams(my_evolver.hof[0])
+        mask = seg.evaluate(img)
 
-    # Send data to web server
-    headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
-    r = requests.post(SERVER_URL, data=json.dumps(data), headers=headers) 
+        # Calculate and print the fitness value of the segmentor
+        fitness = Segmentors.FitnessFunction(mask, gmask)[0]
+        params = my_evolver.hof[0]
+
+        # Combine data into a single object
+        data = {}
+        data["fitness"] = fitness
+        data["params"] = params
+
+        # Convert the data to json format
+        data = json.dumps(data)
+
+        # Send data to web server
+        headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+        r = requests.post(SERVER_URL, data=json.dumps(data), headers=headers) 
