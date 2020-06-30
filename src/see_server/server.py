@@ -14,7 +14,7 @@ class Root:
             return "Current Best: " + \
                 "Fitness: " + str(self.best_ind["fitness"]) +  "\n" + \
                 "Params: " + str(self.best_ind["params"])
-        return open("index.html")
+        return open("./web_pages/index.html")
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
