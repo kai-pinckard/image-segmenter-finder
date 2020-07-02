@@ -1,6 +1,8 @@
 import cherrypy
 import json
 import os
+import imageio
+from see import GeneticSearch, Segmentors
 
 """
 uploaded_file must match the name field of the input element
@@ -42,11 +44,6 @@ class Root:
     # Methods with expose are accessible urls in browser
     @cherrypy.expose
     def index(self):
-        if self.best_fit != -1:
-            return "Current Best: " + \
-                "Fitness: " + str(self.best_ind["fitness"]) +  "\n" + \
-                "Params: " + str(self.best_ind["params"])
-        # Load the html file and display it in the browser=
         html_dir = os.path.join(os.getcwd(), "web_pages", "index.html")
         return open(html_dir)
 
@@ -77,10 +74,22 @@ class Root:
     @cherrypy.expose
     def monitor(self):
         if self.best_fit != -1:
-            return "Current Best: " + \
-                "Fitness: " + str(self.best_ind["fitness"]) +  "\n" + \
-                "Params: " + str(self.best_ind["params"])
-        return "No data is available. Please run the see-segment container."
+            img = imageio.imread(self.rgb_filename)
+            gmask = imageio.imread(self.label_filename)
+
+            print(self.best_ind["params"])
+            self.best_ind["params"]
+            seg = Segmentors.algoFromParams(self.best_ind["params"])
+            mask = seg.evaluate(img)
+
+            static_dir = os.path.join(os.getcwd(), "public")
+            imageio.imwrite(os.path.join(static_dir, "mask.jpg"), mask)
+
+            html_dir = os.path.join(os.getcwd(), "web_pages", "monitor.html")
+            return open(html_dir)
+            
+        html_dir = os.path.join(os.getcwd(), "web_pages", "monitor-wait.html")
+        return open(html_dir)
 
 
 if __name__ == "__main__":
