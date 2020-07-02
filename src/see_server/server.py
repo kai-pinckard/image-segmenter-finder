@@ -44,17 +44,17 @@ class Root:
     # Methods with expose are accessible urls in browser
     @cherrypy.expose
     def index(self):
-        html_dir = os.path.join(os.getcwd(), "web_pages", "index.html")
-        return open(html_dir)
+        html_path = os.path.join(os.getcwd(), "web_pages", "index.html")
+        return open(html_path)
 
     # Users are redirected to this page after submiting their files.
     @cherrypy.expose
-    def upload(self, rgb_image, label_image):
+    def verify(self, rgb_image, label_image):
         save_uploaded_file(rgb_image, self.rgb_filename)
         save_uploaded_file(label_image, self.label_filename)
 
-        html_dir = os.path.join(os.getcwd(), "web_pages", "upload.html")
-        return open(html_dir)
+        html_path = os.path.join(os.getcwd(), "web_pages", "verify.html")
+        return open(html_path)
 
 
     @cherrypy.expose
@@ -85,11 +85,11 @@ class Root:
             static_dir = os.path.join(os.getcwd(), "public")
             imageio.imwrite(os.path.join(static_dir, "mask.jpg"), mask)
 
-            html_dir = os.path.join(os.getcwd(), "web_pages", "monitor.html")
-            return open(html_dir)
+            html_path = os.path.join(os.getcwd(), "web_pages", "monitor.html")
+            return open(html_path)
             
-        html_dir = os.path.join(os.getcwd(), "web_pages", "monitor-wait.html")
-        return open(html_dir)
+        html_path = os.path.join(os.getcwd(), "web_pages", "monitor-wait.html")
+        return open(html_path)
 
 
 if __name__ == "__main__":
@@ -97,7 +97,9 @@ if __name__ == "__main__":
     conf = {
         'global': {
             'server.socket_host':'0.0.0.0',
-            'server.socket_port': 8080
+            'server.socket_port': 8080,
+            'tools.caching.on': False,
+            'tools.caching.debug': False
             },
 
         # This mounts the public directory onto the security directory
