@@ -30,10 +30,15 @@ if __name__ == "__main__":
     rgb_url = "static/rgb.jpg"
     label_url = "static/label.jpg"
 
+    # A seed ensures repeatable results, but severely limits the search
+    # for a good segmentation algorithm. Using the seed parameter
+    # elimates any benefit from running multiple instances of this app
+    use_seed = False
+
     #=====================================================================
     # Handle command line arguments
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "p:g:l:h")
+        opts, args = getopt.getopt(sys.argv[1:], "p:g:l:hs")
     except getopt.GetoptError:
         print("For help run:")
         print("python segment_container.py -h")
@@ -44,14 +49,17 @@ if __name__ == "__main__":
             print("l: Location")
             print("g: number of Generations")
             print("p: Population size")
+            print("s: use a Seed for repeatable results")
             print("To run in a kubernetes cluster run:")
             print("python segment_container.py -l cluster")
             print("To run locally run:")
-            print("python segment_container.py -l local")
+            print("python segment_container.py")
             print("To run with a population size of 6 and to simulate 7 generations run:")
             print("python segment_container.py -p 6 -g 7")
+            print("To run locally with a seed run:")
+            print("python segment_container.py -s")
             print("The defaults:")
-            print("By default location=local population=10 generations=5")
+            print("By default location=local population=10 generations=5 seed=False")
             sys.exit()
         elif opt == "-l":
             if opt == "cluster":
@@ -60,6 +68,8 @@ if __name__ == "__main__":
             pop_size = int(opt)
         elif opt == "-g":
             num_gen = int(opt)
+        elif opt == "-s":
+            use_seed = True
     print("Running with parameters:")
     print("population size =", str(pop_size))
     print("number of generations =", str(num_gen))
