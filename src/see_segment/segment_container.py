@@ -30,10 +30,18 @@ if __name__ == "__main__":
     rgb_url = "static/rgb.jpg"
     label_url = "static/label.jpg"
 
-    # A seed ensures repeatable results, but severely limits the search
-    # for a good segmentation algorithm. Using the seed parameter
-    # elimates any benefit from running multiple instances of this app
-    use_seed = False
+    """
+    A consistent seed ensures repeatable results, but severely limits the search
+    for a good segmentation algorithm. Using the seed parameter
+    elimates any benefit from running multiple instances of this container.
+
+    A seed is used no matter what value is used for the flags. The difference is that when -s
+    is not specified the seed will be picked based on the current time. In contrast, when -s is
+    specified a seed of 0 will always be used.
+
+    The seed is a Work in Progress and is not yet functional.
+    """
+    seed = datetime.now()
 
     #=====================================================================
     # Handle command line arguments
@@ -62,21 +70,20 @@ if __name__ == "__main__":
             print("By default location=local population=10 generations=5 seed=False")
             sys.exit()
         elif opt == "-l":
-            if opt == "cluster":
+            if arg == "cluster":
                 server_url = "http://serverservice"
         elif opt == "-p":
-            pop_size = int(opt)
+            pop_size = int(arg)
         elif opt == "-g":
-            num_gen = int(opt)
+            num_gen = int(arg)
         elif opt == "-s":
-            use_seed = True
+            seed = 0
     print("Running with parameters:")
     print("population size =", str(pop_size))
     print("number of generations =", str(num_gen))
     print("server url =", server_url)
+    print("seed =", seed)
     print("")
-
-
 
     print("Attempting to download images in", initial_delay, "second(s)")
     time.sleep(initial_delay)
@@ -113,7 +120,7 @@ if __name__ == "__main__":
     # gmask = (np.sum(gmask, axis=2) > 0)
 
     # Create an evolver
-    my_evolver = GeneticSearch.Evolver(img, gmask, pop_size=pop_size)
+    my_evolver = GeneticSearch.Evolver(img, gmask, pop_size=pop_size, seed=seed)
     
     # Conduct the genetic search
     population = None
@@ -142,6 +149,8 @@ if __name__ == "__main__":
 
         # Convert the data to json format
         data = json.dumps(data)
+
+        print(i, data, "\n\n")
 
         # Send data to web server
         server_update_url = server_url + "/update"
