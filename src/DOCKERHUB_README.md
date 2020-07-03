@@ -10,6 +10,7 @@ After making and testing any code changes locally, when want to update the conta
 ### Build and push updated see-segment image:
 Run inside the see-segment directory
 Replace the :0.0.4 with the version number you are creating
+Also be sure to update the version number in the yaml files.
 
 `sudo docker build -t seesegment/seesegment:0.0.4 .`
 
@@ -18,6 +19,7 @@ Replace the :0.0.4 with the version number you are creating
 ### Build and push updated server image:
 Run inside the seesegment/see_server directory
 Replace the :0.0.4 with the version number you are creating
+Also be sure to update the version number in the yaml files.
 
 `sudo docker build -t seesegment/seeserver:0.0.4 .`
 
