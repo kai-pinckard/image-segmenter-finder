@@ -9,14 +9,46 @@ After making and testing any code changes locally, when want to update the conta
 
 ### Build and push updated see-segment image:
 Run inside the see-segment directory
+Replace the :0.0.4 with the version number you are creating
 
-`sudo docker build -t seesegment/seesegment:0.0.4`
+`sudo docker build -t seesegment/seesegment:0.0.4 .`
 
 `sudo docker push seesegment/seesegment:0.0.4`
 
 ### Build and push updated server image:
 Run inside the seesegment/see_server directory
+Replace the :0.0.4 with the version number you are creating
 
-`sudo docker build -t seesegment/seeserver:0.0.4`
+`sudo docker build -t seesegment/seeserver:0.0.4 .`
 
 `sudo docker push seesegment/seeserver:0.0.4`
+
+
+### Useful commands
+The following are useful docker commands explained by the tldr command
+(https://tldr.sh/)
+
+#### List currently running docker containers:
+`docker ps`
+
+#### List all docker containers (running and stopped):
+`docker ps -a`
+
+#### Start a container from an image, with a custom name:
+`docker run --name {{container_name}} {{image}}`
+
+#### Start or stop an existing container:
+`docker {{start|stop}} {{container_name}}`
+
+#### Pull an image from a docker registry:
+`docker pull {{image}}`
+
+#### Open a shell inside of an already running container:
+`docker exec -it {{container_name}} {{sh}}`
+
+#### Remove a stopped container:
+`docker rm {{container_name}}`
+
+#### Fetch and follow the logs of a container:
+`docker logs -f {{container_name}}`
+
