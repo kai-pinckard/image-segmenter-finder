@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: server
-        image: seesegment/server:0.0.4
+        image: seesegment/server
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
