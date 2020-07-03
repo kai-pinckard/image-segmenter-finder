@@ -10,6 +10,6 @@ spec:
     spec:
       containers:
       - name: segment
-        image: seesegment/seesegment:0.0.4
+        image: seesegment/seesegment:0.0.8
         imagePullPolicy: Always
       restartPolicy: Never
