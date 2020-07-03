@@ -120,7 +120,7 @@ if __name__ == "__main__":
     # gmask = (np.sum(gmask, axis=2) > 0)
 
     # Create an evolver
-    my_evolver = GeneticSearch.Evolver(img, gmask, pop_size=pop_size, seed=seed)
+    my_evolver = GeneticSearch.Evolver(img, gmask, pop_size=pop_size)
     
     # Conduct the genetic search
     population = None
