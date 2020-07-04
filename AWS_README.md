@@ -1,50 +1,45 @@
-# Step 1:
-Create an AWS account
+## Create an AWS Account
+https://portal.aws.amazon.com/billing/signup#/start
 
-# Step 2:
+## Create an Access Key:
+Part way through the tutorial you will needan "AWS Access Key ID" and "AWS Secret Access Key". 
+
+Open AWS in a browser. In the top right of the screen click my account and then security credentials. On the security credentials page, click "Access Keys". Then click create a new access key. Select Download Access key. Then open the file so that when the time comes you can put use the access key in the tutorial.
+
+## Pick a Region
+If you are fine hosting your cluster in your default region you can proceed to the next step. Otherwise find your region code here:
+
+https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html#concepts-available-regions
+
+## Main Tutorial
+Follow the tutorial until you get to the part that tells you to run `kubectl get svc`. Run that command and ensure everything is working as expected. Note that in the tutorial you will need to use some of the information you obtained in the previous parts of this document. Furthermore, when the time comes select "AWS for linux-only workloads". Note that running the command that creates a kubernetes cluster typically takes about 15 minutes.
+
 https://docs.aws.amazon.com/eks/latest/userguide/getting-started-eksctl.html
 
-
-When running aws configure you will need an aws access key. 
-Open AWS in a browser.
-In the top right of the screen click my account and then security credentials.
-
-On the security credentials page, click Access Keys. Then click create a new access key. Select Download Access key. Then open the file
-put the corresponding access key lines into the aws configure terminal. For default region, either leave it blank or put the region you want.
-For default output select json. 
-
-Select AWS for linux-only workloads
-
-
-eksctl create cluster \
---name prod \
---version 1.16 \
---region us-west-2 \
---nodegroup-name standard-workers \
---node-type t3.medium \
---nodes 3 \
---nodes-min 1 \
---nodes-max 4 \
---managed
-
-
+## Running See Segment
 Once this has successfully finished you can start the application using kubectl
 
-navigate to ./image-segmenter-finder/src/see_server/kube_commands
+Navigate to ./image-segmenter-finder/src/see_server/kube_commands in your cloned local version of this repository. 
 
 Then run:
-kubectl apply -f server_service.yaml
-kubectl apply -f server.yaml
-kubectl apply -f segmentation_job.yaml.yaml
 
-Everything should now be up and running.
+`kubectl apply -f server_service.yaml`
 
-You can access the server by typing
-kubectl get services
+`kubectl apply -f server.yaml`
+
+`kubectl apply -f segmentation_job.yaml.yaml`
+
+
+Everything should now be up and running. You can access the server by typing:
+
+`kubectl get services`
+
 It takes a minute to get set up but eventually there will be an external ip for the server_service
 By copying this ip into a browser you will be able to access the server. 
 
-
 You should be able to delete your cluster with a command similar to
 
-eksctl delete cluster --region=us-west-2 --name=prod
+`eksctl delete cluster --region=us-west-2 --name=prod`
+
+## Known Issues:
+When creating the kubernetes cluster it may state that the creation of the cluster failed because your account is not authorized to use the required compute resources. In this case retrying the command ended up fixing the issue. 
