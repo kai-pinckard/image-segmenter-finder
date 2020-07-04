@@ -17,10 +17,14 @@ Simply increase --num-nodes=1 to have the number of "vm"s you want.
 https://cloud.google.com/kubernetes-engine/docs/quickstart
 
 ## Run See Segment with Kubernetes
-These commands must be executed in the kube_commands folder
+The following commands must be executed in the kube_commands folder:
+
 `kubectl apply -f server_service.yaml`
+
 `kubectl apply -f server.yaml`
+
 `kubectl apply -f segmentation_job.yaml.yaml`
+
 
 Everything should now be up and running.
 
