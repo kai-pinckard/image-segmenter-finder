@@ -12,9 +12,8 @@ save_as is the desired file name for the uploaded file to be
 stored as.
 """
 def save_uploaded_file(uploaded_file, save_as):
-    saved_file_path = os.path.join(os.getcwd(), save_as)
     size = 0
-    with open(saved_file_path, "wb") as f:
+    with open(save_as, "wb") as f:
         while True:
             # Read the image data in chunks of 8192
             data = uploaded_file.file.read(8192)
@@ -30,33 +29,57 @@ class Root:
     def __init__(self):
         self.best_fit = -1
         self.best_ind = {}
-
+        self.base_dir = os.getcwd()
+        self.web_pages_dir = os.path.join(self.base_dir, "web_pages")
         """
         The images must be stored in the directory public
         so that they can be displayed to the user.
-
-        Note: if the filenames are changed then they must also be updated
-        in segment_container.py
         """
-        self.rgb_filename = os.path.join("public", "rgb.jpg")
-        self.label_filename = os.path.join("public", "label.jpg")
+        self.static_dir = os.path.join(self.base_dir, "public")
+
+        # Remove any image files previously saved while the server was running
+        images = os.listdir(self.static_dir)
+        for image in images:
+            img_path = os.path.join(self.static_dir, image)
+            os.remove(img_path)
+
+        # The file extension will be added when the images are uploaded
+        self.rgb_filename = os.path.join(self.static_dir, "rgb.jpg")
+        self.label_filename = os.path.join(self.static_dir, "label.jpg")
 
     # Methods with expose are accessible urls in browser
     @cherrypy.expose
     def index(self):
-        html_path = os.path.join(os.getcwd(), "web_pages", "index.html")
+        html_path = os.path.join(self.web_pages_dir, "index.html")
         return open(html_path)
 
     # Users are redirected to this page after submiting their files.
     @cherrypy.expose
     def verify(self, rgb_image, label_image):
+        # Get the file extensions
+        _, rgb_filetype = os.path.splitext(rgb_image.filename) 
+        _, label_filetype = os.path.splitext(label_image.filename)
+        print(label_filetype)
+
+        # Get the filename
+        rgb_filename, _ = os.path.splitext(self.rgb_filename)
+        label_filename, _ = os.path.splitext(self.label_filename)
+        print(label_filename)
+
+        # Update the filename
+        self.rgb_filename = rgb_filename + rgb_filetype
+        self.label_filename = label_filename + label_filetype
+
         save_uploaded_file(rgb_image, self.rgb_filename)
         save_uploaded_file(label_image, self.label_filename)
 
-        html_path = os.path.join(os.getcwd(), "web_pages", "verify.html")
+        html_path = os.path.join(self.web_pages_dir, "verify.html")
         return open(html_path)
 
 
+    """
+    This url route allows the worker to submit updates to the server.
+    """
     @cherrypy.expose
     @cherrypy.tools.json_out()
     @cherrypy.tools.json_in()
@@ -70,6 +93,16 @@ class Root:
             self.best_ind = input_json
             self.best_fit = self.best_ind["fitness"]
         return result
+    
+    """
+    This url route is used by the worker to get a manifest of the available images.
+    """
+    @cherrypy.expose
+    def manifest(self):
+        images = os.listdir(self.static_dir)
+        json_data = json.dumps(images)
+        return json_data
+
 
     @cherrypy.expose
     def monitor(self):
@@ -85,10 +118,10 @@ class Root:
             static_dir = os.path.join(os.getcwd(), "public")
             imageio.imwrite(os.path.join(static_dir, "mask.jpg"), mask)
 
-            html_path = os.path.join(os.getcwd(), "web_pages", "monitor.html")
+            html_path = os.path.join(self.web_pages_dir, "monitor.html")
             return open(html_path)
             
-        html_path = os.path.join(os.getcwd(), "web_pages", "monitor-wait.html")
+        html_path = os.path.join(self.web_pages_dir, "monitor-wait.html")
         return open(html_path)
 
 

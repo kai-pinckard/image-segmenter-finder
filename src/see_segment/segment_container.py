@@ -85,21 +85,31 @@ if __name__ == "__main__":
     print("seed =", seed)
     print("")
 
-    print("Attempting to download images in", initial_delay, "second(s)")
-    time.sleep(initial_delay)
-
-    # Create image urls
-    rgb_url = server_url + "/" + rgb_url
-    label_url = server_url + "/" + label_url
-
-    # Temporary, needs to be replaced with a means of determining the filetype
-    rgb_filename = "rgb.jpg"
-    label_filename = "label.jpg"
-
+    """
+    Keep requesting an a list of images(a manifest) from the server 
+    until at least two images are present (the images have been uploaded)
+    """
+    image_filenames = []
+    while len(image_filenames) < 2:
+        print("Requesting manifest")
+        server_manifest_url = os.path.join(server_url, "manifest")
+        headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+        r = requests.get(server_manifest_url, headers=headers)
+        image_filenames = r.json()
+        time.sleep(download_delay)
+    
+    # Parse the json data
+    for image in image_filenames:
+        if image.startswith("rgb"):
+            rgb_url = server_url + '/static/' + image
+            rgb_filename = image
+        elif image.startswith("label"):
+            label_url = server_url + '/static/' + image
+            label_filename =  image
+    
     # Create image download commands
     get_rgb = "wget -O " + str(rgb_filename) + " " + str(rgb_url)
     get_label = "wget -O " + str(label_filename) + " " + str(label_url)
-
 
     # Download the images
     download_status = os.system(get_rgb)
@@ -155,4 +165,4 @@ if __name__ == "__main__":
         # Send data to web server
         server_update_url = server_url + "/update"
         headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
-        r = requests.post(server_update_url, data=json.dumps(data), headers=headers) 
+        r = requests.post(server_update_url, data=json.dumps(data), headers=headers)
