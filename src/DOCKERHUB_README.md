@@ -26,6 +26,9 @@ Also be sure to update the version number in the yaml files.
 `sudo docker push seesegment/seeserver:0.0.4`
 
 
+### To run the server locally in a container
+`sudo docker run --name <Replace with Name> -p 8080:8080 <Replace with image>`
+
 ### Useful commands
 The following are useful docker commands explained by the tldr command
 (https://tldr.sh/)
