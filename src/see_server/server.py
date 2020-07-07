@@ -107,7 +107,9 @@ if __name__ == "__main__":
         # the static directory to the server. 
         '/static': {
             'tools.staticdir.on': True,
-            'tools.staticdir.dir': os.path.join(os.getcwd(), "public")
+            'tools.staticdir.dir': os.path.join(os.getcwd(), "public"),
+            'tools.expires.on': True, # cached browser data expires
+            'tools.expires.secs': 1 # cached data expires after 1 sec old
             }
         }
     cherrypy.quickstart(Root(), '/', conf)
