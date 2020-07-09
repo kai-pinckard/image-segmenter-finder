@@ -23,6 +23,21 @@ def save_uploaded_file(uploaded_file, save_as):
             # Write the current chunk into the file to save on disk
             f.write(data)
             size += len(data)
+"""
+Populates html files with dynamic data passed through the data
+parameter. This function returns html that is ready to render.
+html_path: the path to the html file to fill
+data: a list containing args for string formatting
+
+Note: In the html files being filled there are '{}'s with a number
+inside them. For example {0} will be the place where the text in 
+index 0 of the data array will be inserted into the html template.
+"""
+def fill_html_template(html_path, data):
+    with open(html_path, "r") as f:
+        html = f.read()
+    # the * converts the list into args
+    return html.format(*data)
             
 
 class Root:
@@ -73,7 +88,10 @@ class Root:
 
     @cherrypy.expose
     def monitor(self):
+        html_path = os.path.join(os.getcwd(), "web_pages", "monitor.html")
+        
         if self.best_fit != -1:
+            # If there is a segmentor then display the images segmentation
             img = imageio.imread(self.rgb_filename)
             gmask = imageio.imread(self.label_filename)
 
@@ -85,11 +103,13 @@ class Root:
             static_dir = os.path.join(os.getcwd(), "public")
             imageio.imwrite(os.path.join(static_dir, "mask.jpg"), mask)
 
-            html_path = os.path.join(os.getcwd(), "web_pages", "monitor.html")
-            return open(html_path)
-            
-        html_path = os.path.join(os.getcwd(), "web_pages", "monitor-wait.html")
-        return open(html_path)
+            code = GeneticSearch.print_best_algorithm_code(self.best_ind["params"])
+
+            data = ["", code, self.best_ind["params"]]
+        else:
+            data = ['style="display:none;"', "", ""]
+
+        return fill_html_template(html_path, data)
 
 
 if __name__ == "__main__":
