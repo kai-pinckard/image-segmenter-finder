@@ -45,7 +45,19 @@ class Root:
     def __init__(self):
         self.best_fit = -1
         self.best_ind = {}
+        self.base_dir = os.getcwd()
+        self.web_pages_dir = os.path.join(self.base_dir, "web_pages")
+        """
+        The images must be stored in the directory public
+        so that they can be displayed to the user.
+        """
+        self.static_dir = os.path.join(self.base_dir, "public")
 
+        # Remove any image files previously saved while the server was running
+        images = os.listdir(self.static_dir)
+        for image in images:
+            img_path = os.path.join(self.static_dir, image)
+            os.remove(img_path)
         """
         The images must be stored in the directory public
         so that they can be displayed to the user.
@@ -105,9 +117,14 @@ class Root:
 
             code = GeneticSearch.print_best_algorithm_code(self.best_ind["params"])
 
-            data = ["", code, self.best_ind["params"]]
+            # Calculate progress bar precentage
+            percentage = (1 - self.best_ind["fitness"]) * 100
+            
+            rounded_fitness = float("{0:.2f}".format(self.best_ind["fitness"]))
+
+            data = ["", code, self.best_ind["params"], rounded_fitness, percentage]
         else:
-            data = ['style="display:none;"', "", ""]
+            data = ['style="display:none;"', "", "", "",""]
 
         return fill_html_template(html_path, data)
 
