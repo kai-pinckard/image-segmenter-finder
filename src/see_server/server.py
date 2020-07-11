@@ -23,6 +23,21 @@ def save_uploaded_file(uploaded_file, save_as):
             # Write the current chunk into the file to save on disk
             f.write(data)
             size += len(data)
+"""
+Populates html files with dynamic data passed through the data
+parameter. This function returns html that is ready to render.
+html_path: the path to the html file to fill
+data: a list containing args for string formatting
+
+Note: In the html files being filled there are '{}'s with a number
+inside them. For example {0} will be the place where the text in 
+index 0 of the data array will be inserted into the html template.
+"""
+def fill_html_template(html_path, data):
+    with open(html_path, "r") as f:
+        html = f.read()
+    # the * converts the list into args
+    return html.format(*data)
             
 
 class Root:
@@ -30,7 +45,19 @@ class Root:
     def __init__(self):
         self.best_fit = -1
         self.best_ind = {}
+        self.base_dir = os.getcwd()
+        self.web_pages_dir = os.path.join(self.base_dir, "web_pages")
+        """
+        The images must be stored in the directory public
+        so that they can be displayed to the user.
+        """
+        self.static_dir = os.path.join(self.base_dir, "public")
 
+        # Remove any image files previously saved while the server was running
+        images = os.listdir(self.static_dir)
+        for image in images:
+            img_path = os.path.join(self.static_dir, image)
+            os.remove(img_path)
         """
         The images must be stored in the directory public
         so that they can be displayed to the user.
@@ -73,7 +100,10 @@ class Root:
 
     @cherrypy.expose
     def monitor(self):
+        html_path = os.path.join(os.getcwd(), "web_pages", "monitor.html")
+        
         if self.best_fit != -1:
+            # If there is a segmentor then display the images segmentation
             img = imageio.imread(self.rgb_filename)
             gmask = imageio.imread(self.label_filename)
 
@@ -85,11 +115,18 @@ class Root:
             static_dir = os.path.join(os.getcwd(), "public")
             imageio.imwrite(os.path.join(static_dir, "mask.jpg"), mask)
 
-            html_path = os.path.join(os.getcwd(), "web_pages", "monitor.html")
-            return open(html_path)
+            code = GeneticSearch.print_best_algorithm_code(self.best_ind["params"])
+
+            # Calculate progress bar precentage
+            percentage = (1 - self.best_ind["fitness"]) * 100
             
-        html_path = os.path.join(os.getcwd(), "web_pages", "monitor-wait.html")
-        return open(html_path)
+            rounded_fitness = float("{0:.2f}".format(self.best_ind["fitness"]))
+
+            data = ["", code, self.best_ind["params"], rounded_fitness, percentage]
+        else:
+            data = ['style="display:none;"', "", "", "",""]
+
+        return fill_html_template(html_path, data)
 
 
 if __name__ == "__main__":
@@ -107,7 +144,9 @@ if __name__ == "__main__":
         # the static directory to the server. 
         '/static': {
             'tools.staticdir.on': True,
-            'tools.staticdir.dir': os.path.join(os.getcwd(), "public")
+            'tools.staticdir.dir': os.path.join(os.getcwd(), "public"),
+            'tools.expires.on': True, # cached browser data expires
+            'tools.expires.secs': 1 # cached data expires after 1 sec old
             }
         }
     cherrypy.quickstart(Root(), '/', conf)
