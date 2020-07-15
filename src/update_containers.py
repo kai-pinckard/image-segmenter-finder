@@ -15,6 +15,7 @@ the version tag specified.
 import os
 import sys
 
+privilege_modifier = ""
 # This check is here because sudo is required on linux and does not work on windows.
 # Note all versions of windows report as win32 even 64 bit versions.
 if sys.platform == "win32":
@@ -26,7 +27,7 @@ else:
 print("Please enter the version tag you want to use.")
 print("(Check what the latest is on Dockerhub first and increment it)")
 print("(An example version tag is \"0.0.9\")")
-version_tag = input("version tag: ")
+version_tag = raw_input("version tag: ")
 
 print("Building the images.")
 
