@@ -21,7 +21,7 @@ privilege_modifier = ""
 if sys.platform == "win32":
     privilege_modifier = ""
 else:
-    privelege_modifier = "sudo "
+    privilege_modifier = "sudo "
 
 # Get the new version tag from the user.
 print("Please enter the version tag you want to use.")
