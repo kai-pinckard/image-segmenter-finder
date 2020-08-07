@@ -4,6 +4,13 @@ import os
 import imageio
 from see import GeneticSearch, Segmentors
 
+
+
+PUBLIC_DIRECTORY = os.path.join(os.getcwd(), "public")
+
+if not os.path.exists(PUBLIC_DIRECTORY):
+    os.makedirs(PUBLIC_DIRECTORY)
+
 """
 uploaded_file must match the name field of the input element
 in the relevant html file. 
